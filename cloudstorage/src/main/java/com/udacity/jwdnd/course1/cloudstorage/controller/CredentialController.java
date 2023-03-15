@@ -32,12 +32,10 @@ public class CredentialController {
     }
 
     @PostMapping("credential/add-credential")
-    public String addNewCredential(Authentication authentication, EncryptionService encryptionService, @ModelAttribute("newCredential") CredentialForm newCredential, Model model) {
+    public String addNewCredential(Authentication authentication, @ModelAttribute("newCredential") CredentialForm newCredential, Model model) {
         String userName = authentication.getName();
-
         this.credentialService.addCredential(newCredential, userName);
         model.addAttribute("result", "success");
-        //model.addAttribute("decryptedPassword", decryptedPassword);
         return "result";
     }
 }
