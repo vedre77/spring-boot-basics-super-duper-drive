@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class CredentialService {
@@ -45,16 +46,29 @@ public class CredentialService {
     public List<Credential> getAllCredentials() {
         return this.credentialsMapper.getCredentialList();
     }
-    public void addCredential(CredentialForm credentialForm, String userName) {
-        Credential credential = new Credential();
+
+    public Credential updateCredentialFromForm(Credential credential, CredentialForm credentialForm) {
         credential.setUrl(credentialForm.getUrl());
         credential.setUsername(credentialForm.getUsername());
         credential.setPassword(credentialForm.getPassword());
-
+        return credential;
+    }
+    public void addCredential(CredentialForm credentialForm, String userName) {
+        // check if credential exists
+        String credentialId = credentialForm.getCredentialId();
+        if (!Objects.equals(credentialId, "")) {
+            int id = Integer.parseInt(credentialId);
+            Credential credential = credentialsMapper.getSingleCredential(id);
+            Credential updatedCredential = updateCredentialFromForm(credential, credentialForm);
+            credentialsMapper.updateSingleCredential(encryptPassword(updatedCredential));
+            return;
+        }
+        // create new credential
+        Credential credential = new Credential();
+        Credential updatedCredential = updateCredentialFromForm(credential, credentialForm);
         Integer userId = userMapper.getUser(userName).getUserid();
-        credential.setUserId(userId);
-
-        credentialsMapper.insertCredential(encryptPassword(credential));
+        updatedCredential.setUserId(userId);
+        credentialsMapper.insertCredential(encryptPassword(updatedCredential));
     }
 
     public Credential getCredential(Integer credentialId) {
@@ -62,7 +76,7 @@ public class CredentialService {
     }
 
     public void updateCredential(Credential credential) {
-        credentialsMapper.updateCredential(encryptPassword(credential));
+        credentialsMapper.updateSingleCredential(encryptPassword(credential));
     }
 
     public void deleteCredential(int credentialid) {
