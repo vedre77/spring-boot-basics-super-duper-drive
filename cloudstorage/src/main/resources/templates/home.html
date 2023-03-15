@@ -168,7 +168,7 @@
                                     </div>
                                     <div class="modal-body">
                                         <form action="#" th:action="@{/credential/add-credential}" th:object="${newCredential}" method="POST">
-                                            <input type="hidden" name="credentialId" id="credential-id">
+                                            <input type="hidden" th:field="*{credentialId}" name="credentialId" id="credential-id">
                                             <div class="form-group">
                                                 <label for="credential-url" class="col-form-label">URL</label>
                                                 <input type="text" th:field="*{url}" name= "url" class="form-control" id="credential-url" maxlength="100" required>
