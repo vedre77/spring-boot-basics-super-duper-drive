@@ -3,10 +3,11 @@ package com.udacity.jwdnd.course1.cloudstorage.services;
 import com.udacity.jwdnd.course1.cloudstorage.mapper.CredentialsMapper;
 import com.udacity.jwdnd.course1.cloudstorage.mapper.UserMapper;
 import com.udacity.jwdnd.course1.cloudstorage.model.Credential;
+import com.udacity.jwdnd.course1.cloudstorage.model.CredentialForm;
+import com.udacity.jwdnd.course1.cloudstorage.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.List;
@@ -14,20 +15,18 @@ import java.util.List;
 @Service
 public class CredentialService {
 
+    private UserMapper userMapper;
     private CredentialsMapper credentialsMapper;
 
     @Autowired // automatic dependency injection
     private EncryptionService encryptionService;
 
-    public CredentialService(CredentialsMapper credentialsMapper) {
+    public CredentialService(CredentialsMapper credentialsMapper, UserMapper userMapper) {
         this.credentialsMapper = credentialsMapper;
+        this.userMapper = userMapper;
     }
 
-    @PostConstruct
-    public void postConstruct() {
-        System.out.println("Creating Credential Service Bean");
-    }
-    // we need methods to encrypt and decrypt password
+    // we need methods to encrypt and decrypt the password
     public Credential encryptPassword(Credential credential) {
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
@@ -43,12 +42,23 @@ public class CredentialService {
         return credential;
     }
 
-
-    public List<Credential> getAllCredentials(String username) {
-        return this.credentialsMapper.getCredentialList(username);
+    public List<Credential> getAllCredentials() {
+        return this.credentialsMapper.getCredentialList();
     }
-    public void addCredential(Credential credential, int userid) {
-        credentialsMapper.insertCredential(encryptPassword(credential), userid);
+    public void addCredential(CredentialForm credentialForm, String userName) {
+        Credential credential = new Credential();
+        credential.setUrl(credentialForm.getUrl());
+        credential.setUsername(credentialForm.getUsername());
+        credential.setPassword(credentialForm.getPassword());
+
+        Integer userId = userMapper.getUser(userName).getUserid();
+        credential.setUserId(userId);
+
+        credentialsMapper.insertCredential(encryptPassword(credential));
+    }
+
+    public Credential getCredential(Integer credentialId) {
+        return credentialsMapper.getSingleCredential(credentialId);
     }
 
     public void updateCredential(Credential credential) {
