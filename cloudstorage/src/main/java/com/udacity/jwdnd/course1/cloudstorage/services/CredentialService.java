@@ -46,26 +46,29 @@ public class CredentialService {
     public List<Credential> getAllCredentials() {
         return this.credentialsMapper.getCredentialList();
     }
+
+    public Credential updateCredentialFromForm(Credential credential, CredentialForm credentialForm) {
+        credential.setUrl(credentialForm.getUrl());
+        credential.setUsername(credentialForm.getUsername());
+        credential.setPassword(credentialForm.getPassword());
+        return credential;
+    }
     public void addCredential(CredentialForm credentialForm, String userName) {
         // check if credential exists
         String credentialId = credentialForm.getCredentialId();
         if (!Objects.equals(credentialId, "")) {
             int id = Integer.parseInt(credentialId);
             Credential credential = credentialsMapper.getSingleCredential(id);
-            credential.setUrl(credentialForm.getUrl());
-            credential.setUsername(credentialForm.getUsername());
-            credential.setPassword(credentialForm.getPassword());
-            credentialsMapper.updateSingleCredential(encryptPassword(credential));
+            Credential updatedCredential = updateCredentialFromForm(credential, credentialForm);
+            credentialsMapper.updateSingleCredential(encryptPassword(updatedCredential));
             return;
         }
         // create new credential
         Credential credential = new Credential();
-        credential.setUrl(credentialForm.getUrl());
-        credential.setUsername(credentialForm.getUsername());
-        credential.setPassword(credentialForm.getPassword());
+        Credential updatedCredential = updateCredentialFromForm(credential, credentialForm);
         Integer userId = userMapper.getUser(userName).getUserid();
-        credential.setUserId(userId);
-        credentialsMapper.insertCredential(encryptPassword(credential));
+        updatedCredential.setUserId(userId);
+        credentialsMapper.insertCredential(encryptPassword(updatedCredential));
     }
 
     public Credential getCredential(Integer credentialId) {

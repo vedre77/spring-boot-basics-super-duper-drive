@@ -21,13 +21,20 @@ public class CredentialController {
     }
 
     @GetMapping("home")
-    public String getHomePage(Authentication authentication, @ModelAttribute("newCredential") CredentialForm newCredential, Model model) {
+    public String getHomePage(@ModelAttribute("newCredential") CredentialForm newCredential, Model model) {
         model.addAttribute("credentials", credentialService.getAllCredentials());
         return "home";
     }
 
     @GetMapping("credential/add-credential")
     public String getResultPage() {
+        return "result";
+    }
+
+    @GetMapping("credential/delete-credential/{credentialId}")
+    public String deleteCredentialById(@PathVariable("credentialId") int credentialId, Model model) {
+        this.credentialService.deleteCredential(credentialId);
+        model.addAttribute("result", "success");
         return "result";
     }
 
