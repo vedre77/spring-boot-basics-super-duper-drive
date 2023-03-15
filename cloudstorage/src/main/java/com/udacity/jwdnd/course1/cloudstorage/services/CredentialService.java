@@ -73,7 +73,7 @@ public class CredentialService {
     }
 
     public void updateCredential(Credential credential) {
-        credentialsMapper.updateCredential(encryptPassword(credential));
+        credentialsMapper.updateSingleCredential(encryptPassword(credential));
     }
 
     public void deleteCredential(int credentialid) {
