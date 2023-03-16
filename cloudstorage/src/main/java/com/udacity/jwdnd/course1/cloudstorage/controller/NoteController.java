@@ -26,4 +26,5 @@ public class NoteController {
         model.addAttribute("result", "success");
         return "result";
     }
+
 }
