@@ -48,4 +48,8 @@ public class NoteService {
         updatedNote.setUserId(userId);
         noteMapper.insertNote(updatedNote);
     }
+
+    public void deleteNote(int noteid) {
+        noteMapper.deleteNote(noteid);
+    }
 }

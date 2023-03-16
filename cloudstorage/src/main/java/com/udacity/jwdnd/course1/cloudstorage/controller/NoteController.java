@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -23,6 +24,13 @@ public class NoteController {
     public String addNewNote(Authentication authentication, NoteForm noteForm, Model model) {
         String userName = authentication.getName();
         noteService.insertNewNote(noteForm, userName);
+        model.addAttribute("result", "success");
+        return "result";
+    }
+
+    @GetMapping("delete-note/{noteId}")
+    public String deleteNoteById(@PathVariable("noteId") int noteId, Model model) {
+        this.noteService.deleteNote(noteId);
         model.addAttribute("result", "success");
         return "result";
     }

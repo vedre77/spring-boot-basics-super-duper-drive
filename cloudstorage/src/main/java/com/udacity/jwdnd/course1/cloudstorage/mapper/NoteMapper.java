@@ -24,4 +24,6 @@ public interface NoteMapper {
             + "WHERE noteid=#{noteid}")
     void updateSingleNote(Note note);
 
+    @Delete("DELETE FROM notes WHERE noteid = #{noteid}")
+    int deleteNote(int noteid);
 }
