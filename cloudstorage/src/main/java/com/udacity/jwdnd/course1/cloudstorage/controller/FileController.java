@@ -7,9 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Objects;
 
 @Controller
@@ -46,5 +44,12 @@ public class FileController {
     public @ResponseBody
     byte[] viewFile(@PathVariable String fileName) {
         return fileService.getFile(fileName).getFiledata();
+    }
+
+    @GetMapping("/delete-file/{fileName}")
+    public String deleteFile(@PathVariable String fileName, Model model) {
+        fileService.deleteFile(fileName);
+        model.addAttribute("result", "success");
+        return "result";
     }
 }

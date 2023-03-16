@@ -49,4 +49,8 @@ public class FileService {
     public FileModel getFile(String fileName) {
         return fileMapper.getFile(fileName);
     }
+
+    public void deleteFile(String fileName) {
+        fileMapper.deleteFile(fileName);
+    }
 }
