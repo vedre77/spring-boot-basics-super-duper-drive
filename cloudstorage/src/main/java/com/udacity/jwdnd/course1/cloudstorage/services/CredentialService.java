@@ -4,7 +4,6 @@ import com.udacity.jwdnd.course1.cloudstorage.mapper.CredentialsMapper;
 import com.udacity.jwdnd.course1.cloudstorage.mapper.UserMapper;
 import com.udacity.jwdnd.course1.cloudstorage.model.Credential;
 import com.udacity.jwdnd.course1.cloudstorage.model.CredentialForm;
-import com.udacity.jwdnd.course1.cloudstorage.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -69,14 +68,6 @@ public class CredentialService {
         Integer userId = userMapper.getUser(userName).getUserid();
         updatedCredential.setUserId(userId);
         credentialsMapper.insertCredential(encryptPassword(updatedCredential));
-    }
-
-    public Credential getCredential(Integer credentialId) {
-        return credentialsMapper.getSingleCredential(credentialId);
-    }
-
-    public void updateCredential(Credential credential) {
-        credentialsMapper.updateSingleCredential(encryptPassword(credential));
     }
 
     public void deleteCredential(int credentialid) {
