@@ -205,6 +205,11 @@ class CloudStorageApplicationTests {
 
 	}
 	@Test
+	public void testRestrictedAccessToHome() {
+		driver.get("http://localhost:" + this.port + "/home");
+		Assertions.assertFalse(driver.getPageSource().contains("home"));
+	}
+	@Test
 	public void testUserSignupLoginAndLogout() {
 		HomePage homePage = getHomePage();
 		homePage.logout();
@@ -222,5 +227,16 @@ class CloudStorageApplicationTests {
 		homePage.toggleNoteTab();
 		String postedNoteTitle = noteTab.getFirstNoteTitleText();
 		Assertions.assertEquals(noteTitle, postedNoteTitle);
+	}
+
+	@Test
+	public void editNoteAndConfirmChange() throws InterruptedException {
+		createNoteAndFindIt();
+		NoteTab noteTab = new NoteTab(driver);
+		HomePage homePage = new HomePage(driver);
+		noteTab.editNote("change");
+		homePage.toggleNoteTab();
+		String postedNoteTitle = noteTab.getFirstNoteTitleText();
+		Assertions.assertEquals("change", postedNoteTitle);
 	}
 }
