@@ -1,7 +1,9 @@
 package com.udacity.jwdnd.course1.cloudstorage.controller;
 
+import com.udacity.jwdnd.course1.cloudstorage.model.FileModel;
 import com.udacity.jwdnd.course1.cloudstorage.services.FileService;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,7 +25,6 @@ public class FileController {
     public String handleFileUpload(Authentication authentication, @RequestParam("fileUpload")MultipartFile fileUpload, Model model) throws IOException {
         String fileName = fileUpload.getOriginalFilename();
         String userName = authentication.getName();
-        // first upload the file, then introduce checking for existing same file name!!!
         String [] savedFileNames = fileService.getFileNameList();
         for (String savedFilename: savedFileNames) {
             if (Objects.equals(savedFilename, fileName )) {
@@ -41,9 +42,14 @@ public class FileController {
             value = "/get-file/{fileName}",
             produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
     )
-    public @ResponseBody
-    byte[] viewFile(@PathVariable String fileName) {
-        return fileService.getFile(fileName).getFiledata();
+    public ResponseEntity<byte[]> viewFile(@PathVariable String fileName) throws IOException {
+        FileModel fileModel = fileService.getFile(fileName);
+        String fileType = fileService.getFile(fileName).getContenttype();
+        MediaType mediaType = MediaType.parseMediaType(fileType);
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .contentLength(fileModel.getFiledata().length)
+                .body(fileModel.getFiledata());
     }
 
     @GetMapping("/delete-file/{fileName}")
