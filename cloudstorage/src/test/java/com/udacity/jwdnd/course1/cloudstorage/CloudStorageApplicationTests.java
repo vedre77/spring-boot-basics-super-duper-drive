@@ -125,6 +125,17 @@ class CloudStorageApplicationTests {
 	 * Read more about the requirement in the rubric: 
 	 * https://review.udacity.com/#!/rubrics/2724/view 
 	 */
+	public HomePage getHomePage() {
+		doMockSignUp("Mock","Up","mockup","123");
+		String username = "mockup";
+		String password = "123";
+		SignupPage signupPage = new SignupPage(driver);
+		signupPage.getLoginPage();
+		LoginPage loginPage = new LoginPage(driver);
+		loginPage.login(username, password);
+		HomePage homePage = new HomePage(driver);
+		return homePage;
+	}
 	@Test
 	public void testRedirection() {
 		// Create a test account
@@ -193,35 +204,23 @@ class CloudStorageApplicationTests {
 		Assertions.assertFalse(driver.getPageSource().contains("HTTP Status 403 – Forbidden"));
 
 	}
-	// ADDED TESTS/ METHODS
-	public HomePage getHomePage() {
-		doMockSignUp("Mock","Up","mockup","123");
-		String username = "mockup";
-		String password = "123";
-		SignupPage signupPage = new SignupPage(driver);
-		signupPage.getLoginPage();
-
-		LoginPage loginPage = new LoginPage(driver);
-		loginPage.login(username, password);
-
-		HomePage homePage = new HomePage(driver);
-		return homePage;
-	}
 	@Test
 	public void testUserSignupLoginAndLogout() {
-		// user is presented with the login page after logging out
 		HomePage homePage = getHomePage();
 		homePage.logout();
 		Assertions.assertEquals("Login", driver.getTitle());
 	}
 
 	@Test
-	public void createNote() throws InterruptedException {
+	public void createNoteAndFindIt() throws InterruptedException {
 		String noteTitle = "test title";
 		String noteDescription = "test description";
 		HomePage homePage = getHomePage();
-		homePage.postNote(noteTitle, noteDescription);
-		String postedNoteTitle = homePage.getFirstNoteTitleText();
+		homePage.toggleNoteTab();
+		NoteTab noteTab = new NoteTab(driver);
+		noteTab.postNote(noteTitle, noteDescription);
+		homePage.toggleNoteTab();
+		String postedNoteTitle = noteTab.getFirstNoteTitleText();
 		Assertions.assertEquals(noteTitle, postedNoteTitle);
 	}
 }
