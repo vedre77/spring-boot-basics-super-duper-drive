@@ -1,11 +1,9 @@
 package com.udacity.jwdnd.course1.cloudstorage;
 
+import com.udacity.jwdnd.course1.cloudstorage.model.Note;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -13,6 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
 import java.io.File;
+import java.util.Set;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CloudStorageApplicationTests {
 
@@ -84,13 +84,11 @@ class CloudStorageApplicationTests {
 
 		/* Check that the sign up was successful. 
 		// You may have to modify the element "success-msg" and the sign-up 
-		// success message below depening on the rest of your code.
+		// success message below depending on the rest of your code.
 		*/
 		Assertions.assertTrue(driver.findElement(By.id("success-msg")).getText().contains("You successfully signed up!"));
 	}
 
-	
-	
 	/**
 	 * PLEASE DO NOT DELETE THIS method.
 	 * Helper method for Udacity-supplied sanity checks.
@@ -116,7 +114,6 @@ class CloudStorageApplicationTests {
 		loginButton.click();
 
 		webDriverWait.until(ExpectedConditions.titleContains("Home"));
-
 	}
 
 	/**
@@ -136,12 +133,12 @@ class CloudStorageApplicationTests {
 		doMockSignUp("Redirection","Test","RT","123");
 		
 		// Check if we have been redirected to the log in page.
-		Assertions.assertEquals("http://localhost:" + this.port + "/login", driver.getCurrentUrl());
+		Assertions.assertEquals("http://localhost:" + this.port + "/signup", driver.getCurrentUrl());
 	}
 
 	/**
 	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the 
-	 * rest of your code. 
+	 * rest of your code.
 	 * This test is provided by Udacity to perform some basic sanity testing of 
 	 * your code to ensure that it meets certain rubric criteria. 
 	 * 
@@ -161,7 +158,6 @@ class CloudStorageApplicationTests {
 		driver.get("http://localhost:" + this.port + "/some-random-page");
 		Assertions.assertFalse(driver.getPageSource().contains("Whitelabel Error Page"));
 	}
-
 
 	/**
 	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the 
@@ -199,7 +195,59 @@ class CloudStorageApplicationTests {
 		Assertions.assertFalse(driver.getPageSource().contains("HTTP Status 403 – Forbidden"));
 
 	}
-
-
-
+	@Test
+	public void testRestrictedAccessToHome() {
+		driver.get("http://localhost:" + this.port + "/home");
+		Assertions.assertFalse(driver.getPageSource().contains("home"));
+	}
+	@Test
+	public void testGetHomePage() {
+		String firstName = "First";
+		String lastName = "Last";
+		String userName = "userIsMe";
+		String password = "123pass";
+		doMockSignUp(firstName, lastName, userName, password);
+		doLogIn(userName, password);
+	}
+	@Test
+	public void testUserLogout() {
+		testGetHomePage();
+		HomePage homePage = new HomePage(driver);
+		homePage.logout();
+		Assertions.assertEquals("Login", driver.getTitle());
+	}
+	@Test
+	public void testNoteCRUD() throws InterruptedException {
+		// Create a new note
+		String noteTitle = "test title";
+		String noteDescription = "test description";
+		testGetHomePage();
+		HomePage homePage = new HomePage(driver);
+		homePage.toggleNoteTab();
+		NoteTab noteTab = new NoteTab(driver);
+		noteTab.postNote(noteTitle, noteDescription);
+		homePage.toggleNoteTab();
+		String postedNoteTitle = noteTab.getFirstNoteTitleText();
+		Assertions.assertEquals(noteTitle, postedNoteTitle);
+		// Edit the note
+		noteTab.editNote("change");
+		homePage.toggleNoteTab();
+		postedNoteTitle = noteTab.getFirstNoteTitleText();
+		Assertions.assertEquals("change", postedNoteTitle);
+		// Delete the note
+		noteTab.deleteNote();
+		homePage.toggleNoteTab();
+		Assertions.assertThrows(NoSuchElementException.class, () -> {
+			noteTab.checkNoteDeleted();
+		});
+		// Close any new windows and switch back to the original window
+		String originalWindowHandle = driver.getWindowHandle();
+		Set<String> windowHandles = driver.getWindowHandles();
+		windowHandles.remove(originalWindowHandle);
+		for (String windowHandle : windowHandles) {
+			driver.switchTo().window(windowHandle);
+			driver.close();
+		}
+		driver.switchTo().window(originalWindowHandle);
+	}
 }
