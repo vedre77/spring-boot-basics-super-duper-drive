@@ -34,6 +34,9 @@ public class NoteTab {
     @FindBy(className="btn-success")
     private WebElement editNoteButton;
 
+    @FindBy(className="btn-danger")
+    private WebElement deleteNoteButton;
+
     public NoteTab(WebDriver driver) {
         PageFactory.initElements(driver, this);
     }
@@ -41,6 +44,10 @@ public class NoteTab {
         WebDriverWait wait = new WebDriverWait(driver, 10);
         WebElement noteTitleElement = wait.until(ExpectedConditions.visibilityOf(noteTitleText));
         return noteTitleElement.getText();
+    }
+
+    public String checkNoteDeleted() {
+        return noteTitleText.getText();
     }
 
     public void postNote(String title, String description) throws InterruptedException {
@@ -58,6 +65,12 @@ public class NoteTab {
         wait.until(ExpectedConditions.visibilityOf(noteTitleInput)).clear();
         noteTitleInput.sendKeys(newTitle);
         submitNoteButton.click();
+        getHomeLink.click();
+    }
+
+    public void deleteNote(){
+        WebDriverWait wait = new WebDriverWait(driver, 10);
+        deleteNoteButton.click();
         getHomeLink.click();
     }
 }

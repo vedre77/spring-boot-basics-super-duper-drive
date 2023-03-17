@@ -217,7 +217,7 @@ class CloudStorageApplicationTests {
 	}
 
 	@Test
-	public void createNoteAndFindIt() throws InterruptedException {
+	public void createNote() throws InterruptedException {
 		String noteTitle = "test title";
 		String noteDescription = "test description";
 		HomePage homePage = getHomePage();
@@ -230,13 +230,24 @@ class CloudStorageApplicationTests {
 	}
 
 	@Test
-	public void editNoteAndConfirmChange() throws InterruptedException {
-		createNoteAndFindIt();
+	public void editNote() throws InterruptedException {
+		createNote();
 		NoteTab noteTab = new NoteTab(driver);
 		HomePage homePage = new HomePage(driver);
 		noteTab.editNote("change");
 		homePage.toggleNoteTab();
 		String postedNoteTitle = noteTab.getFirstNoteTitleText();
 		Assertions.assertEquals("change", postedNoteTitle);
+	}
+	@Test
+	public void deleteNote() throws InterruptedException {
+		createNote();
+		NoteTab noteTab = new NoteTab(driver);
+		HomePage homePage = new HomePage(driver);
+		noteTab.deleteNote();
+		homePage.toggleNoteTab();
+		Assertions.assertThrows(NoSuchElementException.class, () -> {
+			noteTab.checkNoteDeleted();
+		});
 	}
 }
