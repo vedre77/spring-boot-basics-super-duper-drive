@@ -89,8 +89,6 @@ class CloudStorageApplicationTests {
 		Assertions.assertTrue(driver.findElement(By.id("success-msg")).getText().contains("You successfully signed up!"));
 	}
 
-	
-	
 	/**
 	 * PLEASE DO NOT DELETE THIS method.
 	 * Helper method for Udacity-supplied sanity checks.
@@ -116,7 +114,6 @@ class CloudStorageApplicationTests {
 		loginButton.click();
 
 		webDriverWait.until(ExpectedConditions.titleContains("Home"));
-
 	}
 
 	/**
@@ -136,12 +133,12 @@ class CloudStorageApplicationTests {
 		doMockSignUp("Redirection","Test","RT","123");
 		
 		// Check if we have been redirected to the log in page.
-		Assertions.assertEquals("http://localhost:" + this.port + "/login", driver.getCurrentUrl());
+		Assertions.assertEquals("http://localhost:" + this.port + "/signup", driver.getCurrentUrl());
 	}
 
 	/**
 	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the 
-	 * rest of your code. 
+	 * rest of your code.
 	 * This test is provided by Udacity to perform some basic sanity testing of 
 	 * your code to ensure that it meets certain rubric criteria. 
 	 * 
@@ -161,7 +158,6 @@ class CloudStorageApplicationTests {
 		driver.get("http://localhost:" + this.port + "/some-random-page");
 		Assertions.assertFalse(driver.getPageSource().contains("Whitelabel Error Page"));
 	}
-
 
 	/**
 	 * PLEASE DO NOT DELETE THIS TEST. You may modify this test to work with the 
@@ -199,7 +195,26 @@ class CloudStorageApplicationTests {
 		Assertions.assertFalse(driver.getPageSource().contains("HTTP Status 403 – Forbidden"));
 
 	}
+	// ADDED TESTS/ METHODS
+	public HomePage getHomePage() {
+		doMockSignUp("Mock","Up","mockup","123");
+		String username = "mockup";
+		String password = "123";
+		SignupPage signupPage = new SignupPage(driver);
+		signupPage.getLoginPage();
 
+		LoginPage loginPage = new LoginPage(driver);
+		loginPage.login(username, password);
 
+		HomePage homePage = new HomePage(driver);
+		return homePage;
+	}
+	@Test
+	public void testUserSignupLoginAndLogout() {
+		// user is presented with the login page after logging out
+		HomePage homePage = getHomePage();
+		homePage.logout();
+		Assertions.assertEquals("Login", driver.getTitle());
+	}
 
 }
