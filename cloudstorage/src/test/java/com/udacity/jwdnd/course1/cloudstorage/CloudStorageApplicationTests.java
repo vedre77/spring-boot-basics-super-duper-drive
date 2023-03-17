@@ -1,11 +1,9 @@
 package com.udacity.jwdnd.course1.cloudstorage;
 
+import com.udacity.jwdnd.course1.cloudstorage.model.Note;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -217,4 +215,13 @@ class CloudStorageApplicationTests {
 		Assertions.assertEquals("Login", driver.getTitle());
 	}
 
+	@Test
+	public void createNote() throws InterruptedException {
+		String noteTitle = "test title";
+		String noteDescription = "test description";
+		HomePage homePage = getHomePage();
+		homePage.postNote(noteTitle, noteDescription);
+		String postedNoteTitle = homePage.getFirstNoteTitleText();
+		Assertions.assertEquals(noteTitle, postedNoteTitle);
+	}
 }
