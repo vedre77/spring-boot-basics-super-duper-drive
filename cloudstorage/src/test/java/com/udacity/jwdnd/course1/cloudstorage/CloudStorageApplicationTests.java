@@ -11,6 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
 import java.io.File;
+import java.util.Set;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CloudStorageApplicationTests {
 
@@ -82,7 +84,7 @@ class CloudStorageApplicationTests {
 
 		/* Check that the sign up was successful. 
 		// You may have to modify the element "success-msg" and the sign-up 
-		// success message below depening on the rest of your code.
+		// success message below depending on the rest of your code.
 		*/
 		Assertions.assertTrue(driver.findElement(By.id("success-msg")).getText().contains("You successfully signed up!"));
 	}
@@ -125,17 +127,6 @@ class CloudStorageApplicationTests {
 	 * Read more about the requirement in the rubric: 
 	 * https://review.udacity.com/#!/rubrics/2724/view 
 	 */
-	public HomePage getHomePage() {
-		doMockSignUp("Mock","Up","mockup","123");
-		String username = "mockup";
-		String password = "123";
-		SignupPage signupPage = new SignupPage(driver);
-		signupPage.getLoginPage();
-		LoginPage loginPage = new LoginPage(driver);
-		loginPage.login(username, password);
-		HomePage homePage = new HomePage(driver);
-		return homePage;
-	}
 	@Test
 	public void testRedirection() {
 		// Create a test account
@@ -210,44 +201,53 @@ class CloudStorageApplicationTests {
 		Assertions.assertFalse(driver.getPageSource().contains("home"));
 	}
 	@Test
-	public void testUserSignupLoginAndLogout() {
-		HomePage homePage = getHomePage();
+	public void testGetHomePage() {
+		String firstName = "First";
+		String lastName = "Last";
+		String userName = "userIsMe";
+		String password = "123pass";
+		doMockSignUp(firstName, lastName, userName, password);
+		doLogIn(userName, password);
+	}
+	@Test
+	public void testUserLogout() {
+		testGetHomePage();
+		HomePage homePage = new HomePage(driver);
 		homePage.logout();
 		Assertions.assertEquals("Login", driver.getTitle());
 	}
-
 	@Test
-	public void createNote() throws InterruptedException {
+	public void testNoteCRUD() throws InterruptedException {
+		// Create a new note
 		String noteTitle = "test title";
 		String noteDescription = "test description";
-		HomePage homePage = getHomePage();
+		testGetHomePage();
+		HomePage homePage = new HomePage(driver);
 		homePage.toggleNoteTab();
 		NoteTab noteTab = new NoteTab(driver);
 		noteTab.postNote(noteTitle, noteDescription);
 		homePage.toggleNoteTab();
 		String postedNoteTitle = noteTab.getFirstNoteTitleText();
 		Assertions.assertEquals(noteTitle, postedNoteTitle);
-	}
-
-	@Test
-	public void editNote() throws InterruptedException {
-		createNote();
-		NoteTab noteTab = new NoteTab(driver);
-		HomePage homePage = new HomePage(driver);
+		// Edit the note
 		noteTab.editNote("change");
 		homePage.toggleNoteTab();
-		String postedNoteTitle = noteTab.getFirstNoteTitleText();
+		postedNoteTitle = noteTab.getFirstNoteTitleText();
 		Assertions.assertEquals("change", postedNoteTitle);
-	}
-	@Test
-	public void deleteNote() throws InterruptedException {
-		createNote();
-		NoteTab noteTab = new NoteTab(driver);
-		HomePage homePage = new HomePage(driver);
+		// Delete the note
 		noteTab.deleteNote();
 		homePage.toggleNoteTab();
 		Assertions.assertThrows(NoSuchElementException.class, () -> {
 			noteTab.checkNoteDeleted();
 		});
+		// Close any new windows and switch back to the original window
+		String originalWindowHandle = driver.getWindowHandle();
+		Set<String> windowHandles = driver.getWindowHandles();
+		windowHandles.remove(originalWindowHandle);
+		for (String windowHandle : windowHandles) {
+			driver.switchTo().window(windowHandle);
+			driver.close();
+		}
+		driver.switchTo().window(originalWindowHandle);
 	}
 }
