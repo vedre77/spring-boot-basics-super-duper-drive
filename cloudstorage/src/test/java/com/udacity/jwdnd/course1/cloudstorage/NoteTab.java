@@ -10,15 +10,15 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class NoteTab {
 
-    private WebDriver driver = new ChromeDriver();
+    private WebDriver driver;
 
     @FindBy(id="add-note-button")
     private WebElement addNoteButton;
-    // NOTE DISPLAY FIELD
+
     @FindBy(className="note-title")
     private WebElement noteTitleText;
 
-    // NOTE FORM FIELDS
+
     @FindBy(id="note-title")
     private WebElement noteTitleInput;
 
@@ -38,21 +38,19 @@ public class NoteTab {
     private WebElement deleteNoteButton;
 
     public NoteTab(WebDriver driver) {
+        this.driver = driver;
         PageFactory.initElements(driver, this);
     }
+
     public String getFirstNoteTitleText() {
         WebDriverWait wait = new WebDriverWait(driver, 10);
         WebElement noteTitleElement = wait.until(ExpectedConditions.visibilityOf(noteTitleText));
         return noteTitleElement.getText();
     }
 
-    public String checkNoteDeleted() {
-        return noteTitleText.getText();
-    }
-
     public void postNote(String title, String description) throws InterruptedException {
         WebDriverWait wait = new WebDriverWait(driver, 10);
-        addNoteButton.click();
+        wait.until(ExpectedConditions.visibilityOf(addNoteButton)).click();
         wait.until(ExpectedConditions.visibilityOf(noteTitleInput)).sendKeys(title);
         noteDescriptionInput.sendKeys(description);
         submitNoteButton.click();
@@ -61,7 +59,7 @@ public class NoteTab {
 
     public void editNote(String newTitle) {
         WebDriverWait wait = new WebDriverWait(driver, 10);
-        editNoteButton.click();
+        wait.until(ExpectedConditions.visibilityOf(editNoteButton)).click();
         wait.until(ExpectedConditions.visibilityOf(noteTitleInput)).clear();
         noteTitleInput.sendKeys(newTitle);
         submitNoteButton.click();
@@ -70,7 +68,11 @@ public class NoteTab {
 
     public void deleteNote(){
         WebDriverWait wait = new WebDriverWait(driver, 10);
-        deleteNoteButton.click();
+        wait.until(ExpectedConditions.visibilityOf(deleteNoteButton)).click();
         getHomeLink.click();
+    }
+
+    public String checkNoteDeleted() {
+        return noteTitleText.getText();
     }
 }

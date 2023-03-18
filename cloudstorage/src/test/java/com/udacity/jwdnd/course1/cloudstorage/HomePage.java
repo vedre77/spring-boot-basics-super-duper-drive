@@ -8,15 +8,18 @@ import org.openqa.selenium.support.PageFactory;
 
 public class HomePage {
 
-    private WebDriver driver = new ChromeDriver();
+    private WebDriver driver;
 
     @FindBy(id="logout-button")
     private WebElement logoutButton;
-
+    // TABS
     @FindBy(id="nav-notes-tab")
     private WebElement noteTabLink;
+    @FindBy(id="nav-credentials-tab")
+    private WebElement credentialTabLink;
 
     public HomePage(WebDriver driver) {
+        this.driver = driver;
         PageFactory.initElements(driver, this);
     }
 
@@ -26,5 +29,8 @@ public class HomePage {
 
     public void toggleNoteTab() {
         noteTabLink.click();
+    }
+    public void toggleCredentialTab() {
+        credentialTabLink.click();
     }
 }
