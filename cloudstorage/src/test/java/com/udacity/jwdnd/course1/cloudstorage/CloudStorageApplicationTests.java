@@ -41,6 +41,10 @@ class CloudStorageApplicationTests {
 		Assertions.assertEquals("Login", driver.getTitle());
 	}
 
+	public WebDriver getDriver() {
+		return driver;
+	}
+
 	/**
 	 * PLEASE DO NOT DELETE THIS method.
 	 * Helper method for Udacity-supplied sanity checks.
@@ -213,55 +217,5 @@ class CloudStorageApplicationTests {
 		HomePage homePage = new HomePage(driver);
 		homePage.logout();
 		Assertions.assertEquals("Login", driver.getTitle());
-	}
-	@Test
-	public void testNoteCRUD() throws InterruptedException {
-		// Create a new note
-		String noteTitle = "test title";
-		String noteDescription = "test description";
-		testGetHomePage();
-		HomePage homePage = new HomePage(driver);
-		homePage.toggleNoteTab();
-		NoteTab noteTab = new NoteTab(driver);
-		noteTab.postNote(noteTitle, noteDescription);
-		homePage.toggleNoteTab();
-		Assertions.assertTrue(driver.getPageSource().contains(noteTitle));
-		// Edit the note
-		noteTab.editNote("change");
-		homePage.toggleNoteTab();
-		Assertions.assertTrue(driver.getPageSource().contains("change"));
-		// Delete the note
-		noteTab.deleteNote();
-		homePage.toggleNoteTab();
-		Assertions.assertThrows(NoSuchElementException.class, () -> {
-			noteTab.checkNoteDeleted();
-		});
-	}
-	// edit, verify displayed, delete, verify no longer disply.
-	@Test
-	public void testCredentialCRUD() throws InterruptedException {
-		// Create a new credential
-		String url = "myUrl";
-		String username = "meAgain";
-		String password = "findMe";
-		testGetHomePage();
-		HomePage homePage = new HomePage(driver);
-		homePage.toggleCredentialTab();
-		CredentialTab credentialTab = new CredentialTab(driver);
-		credentialTab.postCredential(url, username, password);
-		homePage.toggleCredentialTab();
-		Assertions.assertTrue(driver.getPageSource().contains(url));
-		Assertions.assertNotEquals(credentialTab.findDisplayedPassword(), password);
-		// edit a credential
-		String newUsername = "newMe";
-		credentialTab.editCredential(newUsername);
-		homePage.toggleCredentialTab();
-		Assertions.assertTrue(driver.getPageSource().contains(newUsername));
-		// delete a credential
-		credentialTab.deleteCredential();
-		homePage.toggleCredentialTab();
-		Assertions.assertThrows(NoSuchElementException.class, () -> {
-			credentialTab.checkCredentialDeleted();
-		});
 	}
 }
